@@ -36,13 +36,14 @@ import org.apache.flink.util.Collector;
 import java.util.Properties;
 
 
-public class StreamingJob {
+public class Consumer {
 
 	public static void main(String[] args) throws Exception {
 		final int groups = 10;
 		ParameterTool parameterTool = ParameterTool.fromArgs(args);
 
-		final String topic = parameterTool.get("topic", "input");
+		final String topic = parameterTool.get("topic", "test");
+		final long delay = parameterTool.getLong("delay", 300L);
 		final Properties props = new Properties();
 
 		final String bootstrapServers = parameterTool.get("bootstrapServers", "localhost:9092");
@@ -51,9 +52,10 @@ public class StreamingJob {
 		props.setProperty("bootstrap.servers", bootstrapServers);
 		props.setProperty("group.id", groupId);
 
-		
 		// set up the streaming execution environment
 		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+
+		env.enableCheckpointing(1000L);
 
 		DataStream<String> input = env.addSource(new FlinkKafkaConsumer09<>(topic, new SimpleStringSchema(), props));
 
@@ -67,6 +69,8 @@ public class StreamingJob {
 				} catch (NumberFormatException e) {
 					// ignore
 				}
+
+				Thread.sleep(delay);
 			}
 		});
 
@@ -102,6 +106,6 @@ public class StreamingJob {
 		result.addSink(new PrintSinkFunction<Tuple2<Integer, Integer>>());
 
 		// execute program
-		env.execute("Flink Forward Kafka demo");
+		env.execute("Flink Forward Demoe: Kafka Consumer");
 	}
 }
