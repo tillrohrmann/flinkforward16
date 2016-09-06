@@ -43,7 +43,7 @@ public class Consumer {
 		ParameterTool parameterTool = ParameterTool.fromArgs(args);
 
 		final String topic = parameterTool.get("topic", "test");
-		final long delay = parameterTool.getLong("delay", 300L);
+		final long delay = parameterTool.getLong("delay", 100L);
 		final Properties props = new Properties();
 
 		final String bootstrapServers = parameterTool.get("bootstrapServers", "localhost:9092");
@@ -51,11 +51,13 @@ public class Consumer {
 
 		props.setProperty("bootstrap.servers", bootstrapServers);
 		props.setProperty("group.id", groupId);
+		props.setProperty("max.partition.fetch.bytes", "512");
+		props.setProperty("receive.buffer.bytes", "512");
 
 		// set up the streaming execution environment
 		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-		env.enableCheckpointing(1000L);
+		env.enableCheckpointing(250L);
 
 		DataStream<String> input = env.addSource(new FlinkKafkaConsumer09<>(topic, new SimpleStringSchema(), props));
 
@@ -106,6 +108,6 @@ public class Consumer {
 		result.addSink(new PrintSinkFunction<Tuple2<Integer, Integer>>());
 
 		// execute program
-		env.execute("Flink Forward Demoe: Kafka Consumer");
+		env.execute("Flink Forward Demo: Kafka Consumer");
 	}
 }

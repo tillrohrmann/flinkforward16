@@ -37,7 +37,7 @@ public class Producer {
         final int maxValue = parameterTool.getInt("maxValue", 1000);
         final String topic = parameterTool.get("topic", "test");
         final String bootstrapServers = parameterTool.get("bootstrapServers", "localhost:9092");
-        final long delay = parameterTool.getLong("delay", 300L);
+        final long delay = parameterTool.getLong("delay", 100L);
         final Properties props = new Properties();
 
         props.setProperty("bootstrap.servers", bootstrapServers);
