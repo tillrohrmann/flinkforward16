@@ -1,0 +1,9 @@
+1. copy graphite jar to flink/lib
+2. copy flink-conf.yaml from resources folder to flink/conf
+3. start graphite on port 2003
+	3.1 python /opt/graphite/bin/carbon-cache.py start
+	3.2 python /opt/graphite/bin/run-graphite-devel-server.py /opt/graphite
+4. start grafana (port 3000): brew services start grafana
+5. start flink cluster flink/bin/start-cluster.sh
+6. start producer: bin/flink run -p 2 -c org.stsffap.Producer ~/work/flink/workspace/flinkforward16/target/flinkforward16-1.0-SNAPSHOT.jar
+7. start consumer: bin/flink run ~/work/flink/workspace/flinkforward16/target/flinkforward16-1.0-SNAPSHOT.jar
