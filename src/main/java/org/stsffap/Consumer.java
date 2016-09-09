@@ -28,8 +28,8 @@ import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.sink.PrintSinkFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer09;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer09;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import org.apache.flink.util.Collector;
 
@@ -42,7 +42,8 @@ public class Consumer {
 		final int groups = 10;
 		ParameterTool parameterTool = ParameterTool.fromArgs(args);
 
-		final String topic = parameterTool.get("topic", "test");
+		final String inputTopic = parameterTool.get("input", "input");
+		final String outputTopic = parameterTool.get("output", "output");
 		final long delay = parameterTool.getLong("delay", 100L);
 		final Properties props = new Properties();
 
@@ -59,7 +60,7 @@ public class Consumer {
 
 		env.enableCheckpointing(250L);
 
-		DataStream<String> input = env.addSource(new FlinkKafkaConsumer09<>(topic, new SimpleStringSchema(), props));
+		DataStream<String> input = env.addSource(new FlinkKafkaConsumer09<>(inputTopic, new SimpleStringSchema(), props));
 
 		DataStream<Integer> integerInput = input.flatMap(new FlatMapFunction<String, Integer>() {
 			private static final long serialVersionUID = 1245758969199704087L;
@@ -76,14 +77,14 @@ public class Consumer {
 			}
 		});
 
-		DataStream<Tuple2<Integer, Integer>> result = integerInput.keyBy(new KeySelector<Integer, Integer>() {
+		DataStream<String> result = integerInput.keyBy(new KeySelector<Integer, Integer>() {
 			private static final long serialVersionUID = -602498589721795420L;
 
 			@Override
 			public Integer getKey(Integer integer) throws Exception {
 				return integer % groups;
 			}
-		}).map(new RichMapFunction<Integer, Tuple2<Integer, Integer>>() {
+		}).map(new RichMapFunction<Integer, String>() {
 			private static final long serialVersionUID = -8454791371747729272L;
 
 			private final ValueStateDescriptor<Integer> counterStateDescriptor = new ValueStateDescriptor<>("counter", Integer.class, 0);
@@ -96,16 +97,16 @@ public class Consumer {
 			}
 
 			@Override
-			public Tuple2<Integer, Integer> map(Integer integer) throws Exception {
+			public String map(Integer integer) throws Exception {
 				int currentCount = counter.value();
 
 				counter.update(currentCount + 1);
 
-				return Tuple2.of(integer, currentCount + 1);
+				return Tuple2.of(integer, currentCount + 1).toString();
 			}
 		});
 
-		result.addSink(new PrintSinkFunction<Tuple2<Integer, Integer>>());
+		result.addSink(new FlinkKafkaProducer09<String>(outputTopic, new SimpleStringSchema(), props));
 
 		// execute program
 		env.execute("Flink Forward Demo: Kafka Consumer");
