@@ -60,6 +60,7 @@ metrics.reporters: graphite_reporter
 metrics.reporter.graphite_reporter.class: org.apache.flink.metrics.graphite.GraphiteReporter
 metrics.reporter.graphite_reporter.host: localhost
 metrics.reporter.graphite_reporter.port: 2003
+metrics.reporter.graphite_reporter.interval: 1 seconds
 #==============================================================================
 # Web Frontend
 #==============================================================================

@@ -34,7 +34,7 @@ public class Producer {
     public static void main(String[] args) throws Exception {
         ParameterTool parameterTool = ParameterTool.fromArgs(args);
 
-        final int maxValue = parameterTool.getInt("maxValue", 1000);
+        final int maxValue = parameterTool.getInt("maxValue", 20);
         final String topic = parameterTool.get("output", "input");
         final String bootstrapServers = parameterTool.get("bootstrapServers", "localhost:9092");
         final long delay = parameterTool.getLong("delay", 100L);
@@ -55,7 +55,7 @@ public class Producer {
                 }
             });
 
-        input.addSink(new FlinkKafkaProducer09<>(topic, new SimpleStringSchema(), props));
+        input.addSink(new FlinkKafkaProducer09<>(topic, new SimpleStringSchema(), props, null));
 
         env.execute("Flink Forward Demo: Kafka Producer");
     }
