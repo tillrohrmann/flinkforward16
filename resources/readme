@@ -4,6 +4,9 @@
 	3.1 python /opt/graphite/bin/carbon-cache.py start
 	3.2 python /opt/graphite/bin/run-graphite-devel-server.py /opt/graphite
 4. start grafana (port 3000): brew services start grafana
-5. start flink cluster flink/bin/start-cluster.sh
-6. start producer: bin/flink run -p 2 -c org.stsffap.Producer ~/work/flink/workspace/flinkforward16/target/flinkforward16-1.0-SNAPSHOT.jar
-7. start consumer: bin/flink run ~/work/flink/workspace/flinkforward16/target/flinkforward16-1.0-SNAPSHOT.jar
+5. start kafka
+	5.1 bin/zookeeper-server-start.sh config/zookeeper.properties
+	5.2 bin/kafka-server-start.sh config/server.properties
+6. start flink cluster flink/bin/start-cluster.sh
+7. start producer: bin/flink run -p 2 -c org.stsffap.Producer ~/work/flink/workspace/flinkforward16/target/flinkforward16-1.0-SNAPSHOT.jar
+8. start consumer: bin/flink run ~/work/flink/workspace/flinkforward16/target/flinkforward16-1.0-SNAPSHOT.jar
