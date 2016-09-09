@@ -106,7 +106,7 @@ public class Consumer {
 			}
 		});
 
-		result.addSink(new FlinkKafkaProducer09<String>(outputTopic, new SimpleStringSchema(), props));
+		result.addSink(new FlinkKafkaProducer09<>(outputTopic, new SimpleStringSchema(), props));
 
 		// execute program
 		env.execute("Flink Forward Demo: Kafka Consumer");
